@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 
@@ -13,34 +14,22 @@ func (a *application) home(w http.ResponseWriter, r *http.Request) {
 		a.notFound(w)
 		return
 	}
-	// Initialize a slice containing the paths to the two files. Note that the
-	// home.page.tmpl file must be the *first* file in the slice.
-	//files := []string{
-	//	"./ui/html/home.page.tmpl",
-	//	"./ui/html/base.layout.tmpl",
-	//	"./ui/html/footer.partial.tmpl",
-	//}
-	//// Use the template.ParseFiles() function to read the files and store the
-	//// templates in a template set. Notice that we can pass the slice of file p
-	//// as a variadic parameter?
-	//ts, err := template.ParseFiles(files...)
-	//if err != nil {
-	//	a.errorLog.Println(err.Error())
-	//	a.serverError(w, err)
-	//	return
-	//}
-	//err = ts.Execute(w, nil)
-	//if err != nil {
-	//	a.errorLog.Println(err.Error())
-	//	http.Error(w, "Internal Server Error", 500)
-	//}
-	s, err := a.snippets.Latest()
+
+	files := []string{
+		"./ui/html/home.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+	ts, err := template.ParseFiles(files...)
 	if err != nil {
+		a.errorLog.Println(err.Error())
 		a.serverError(w, err)
 		return
 	}
-	for _, snippet := range s {
-		fmt.Fprintf(w, "%v\n", snippet)
+	err = ts.Execute(w, nil)
+	if err != nil {
+		a.errorLog.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
 	}
 }
 
@@ -56,9 +45,25 @@ func (a *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if err != nil {
 		a.serverError(w, err)
+		return
 	}
 
-	fmt.Fprintf(w, "%v", s)
+	data := &templateData{Snippet: s}
+	files := []string{
+		"./ui/html/show.page.tmpl",
+		"./ui/html/base.layout.tmpl",
+		"./ui/html/footer.partial.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		a.serverError(w, err)
+		return
+	}
+	err = ts.Execute(w, data)
+	if err != nil {
+		a.serverError(w, err)
+	}
 }
 
 func (a *application) createSnippet(w http.ResponseWriter, r *http.Request) {
