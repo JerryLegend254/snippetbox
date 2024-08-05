@@ -15,6 +15,14 @@ func (a *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	s, err := a.snippets.Latest()
+	if err != nil {
+		a.serverError(w, err)
+		return
+	}
+
+	data := &templateData{Snippets: s}
+
 	files := []string{
 		"./ui/html/home.page.tmpl",
 		"./ui/html/base.layout.tmpl",
@@ -26,7 +34,7 @@ func (a *application) home(w http.ResponseWriter, r *http.Request) {
 		a.serverError(w, err)
 		return
 	}
-	err = ts.Execute(w, nil)
+	err = ts.Execute(w, data)
 	if err != nil {
 		a.errorLog.Println(err.Error())
 		http.Error(w, "Internal Server Error", 500)
