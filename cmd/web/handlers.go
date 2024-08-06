@@ -21,24 +21,10 @@ func (a *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &templateData{Snippets: s}
+	a.render(w, r, "home.page.tmpl", &templateData{
+		Snippets: s,
+	})
 
-	files := []string{
-		"./ui/html/home.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
-	}
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		a.errorLog.Println(err.Error())
-		a.serverError(w, err)
-		return
-	}
-	err = ts.Execute(w, data)
-	if err != nil {
-		a.errorLog.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
-	}
 }
 
 func (a *application) showSnippet(w http.ResponseWriter, r *http.Request) {
@@ -56,22 +42,10 @@ func (a *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := &templateData{Snippet: s}
-	files := []string{
-		"./ui/html/show.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
-	}
+	a.render(w, r, "show.page.tmpl", &templateData{
+		Snippet: s,
+	})
 
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		a.serverError(w, err)
-		return
-	}
-	err = ts.Execute(w, data)
-	if err != nil {
-		a.serverError(w, err)
-	}
 }
 
 func (a *application) createSnippet(w http.ResponseWriter, r *http.Request) {
