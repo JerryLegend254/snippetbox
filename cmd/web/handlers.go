@@ -6,13 +6,10 @@ import (
 	"strconv"
 
 	"github.com/JerryLegend254/snippetbox/pkg/models"
+	"github.com/go-chi/chi/v5"
 )
 
 func (a *application) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		a.notFound(w)
-		return
-	}
 
 	s, err := a.snippets.Latest()
 	if err != nil {
@@ -27,7 +24,7 @@ func (a *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) showSnippet(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil || id < 1 {
 		a.notFound(w)
 		return
@@ -48,11 +45,6 @@ func (a *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *application) createSnippet(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.Header().Set("Allow", http.MethodPost)
-		a.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
 	title := "O snail"
 	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n- Kobayashi Issa"
 	expires := "7"
