@@ -2,10 +2,10 @@ package main
 
 import (
 	"html/template"
-	"net/url"
 	"path/filepath"
 	"time"
 
+	"github.com/JerryLegend254/snippetbox/pkg/forms"
 	"github.com/JerryLegend254/snippetbox/pkg/models"
 )
 
@@ -15,8 +15,7 @@ import (
 // to it as the build progresses.
 type templateData struct {
 	CurrentYear int
-	FormErrors  map[string]string
-	FormData    url.Values
+	Form        *forms.Form
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
 }
