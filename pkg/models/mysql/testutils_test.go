@@ -2,7 +2,9 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -12,7 +14,7 @@ func newTestDB(t *testing.T) (*sql.DB, func()) {
 	// to use the `multiStatements=true` parameter in our DSN. This instructs
 	// our MySQL database driver to support executing multiple SQL statements
 	// in one db.Exec()` call.
-	db, err := sql.Open("mysql", "test_web:@/test_snippetbox?parseTime=true")
+	db, err := sql.Open("mysql", "root:pass254@tcp(localhost:3307)/test_snippetbox?parseTime=true")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -21,9 +23,17 @@ func newTestDB(t *testing.T) (*sql.DB, func()) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = db.Exec(string(script))
-	if err != nil {
-		t.Fatal(err)
+
+	scriptsSlice := strings.Split(string(script), ";")
+	newSlice := make([]string, len(scriptsSlice)-1)
+	copy(newSlice, scriptsSlice[:len(scriptsSlice)-1])
+	scriptsSlice = newSlice
+	for _, s := range scriptsSlice {
+		_, err = db.Exec(fmt.Sprintf("%s;", s))
+		if err != nil {
+			t.Fatal(err)
+		}
+
 	}
 	// Return the connection pool and an anonymous function which reads and
 	// executes the teardown script, and closes the connection pool. We can
@@ -34,9 +44,15 @@ func newTestDB(t *testing.T) (*sql.DB, func()) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		_, err = db.Exec(string(script))
-		if err != nil {
-			t.Fatal(err)
+		scriptsSlice := strings.Split(string(script), ";")
+		newSlice := make([]string, len(scriptsSlice)-1)
+		copy(newSlice, scriptsSlice[:len(scriptsSlice)-1])
+		scriptsSlice = newSlice
+		for _, s := range scriptsSlice {
+			_, err = db.Exec(fmt.Sprintf("%s;", s))
+			if err != nil {
+				t.Fatal(err)
+			}
 		}
 		db.Close()
 	}
