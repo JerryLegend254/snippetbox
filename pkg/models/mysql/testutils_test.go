@@ -14,7 +14,7 @@ func newTestDB(t *testing.T) (*sql.DB, func()) {
 	// to use the `multiStatements=true` parameter in our DSN. This instructs
 	// our MySQL database driver to support executing multiple SQL statements
 	// in one db.Exec()` call.
-	db, err := sql.Open("mysql", "root:pass254@tcp(localhost:3307)/test_snippetbox?parseTime=true")
+	db, err := sql.Open("mysql", "root:root@/test_snippetbox?parseTime=true")
 	if err != nil {
 		t.Fatal(err)
 	}
