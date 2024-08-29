@@ -25,6 +25,11 @@ jobs:
       DB_USER: ${{ secrets.DB_USER}}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD}}
     steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.23.x"
       - name: Start MySQL
         run: |
           sudo /etc/init.d/mysql start
