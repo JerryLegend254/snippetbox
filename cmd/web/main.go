@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"database/sql"
 	"flag"
 	"log"
@@ -62,7 +61,7 @@ func main() {
 
 	session := sessions.New([]byte(*secret))
 	session.Lifetime = 12 * time.Hour
-	session.Secure = true
+	//session.Secure = true
 
 	app := &application{
 		errorLog:      errorLog,
@@ -73,10 +72,10 @@ func main() {
 		users:         &mysql.UserModel{DB: db},
 	}
 
-	tlsConfig := &tls.Config{
-		PreferServerCipherSuites: true,
-		CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP256},
-	}
+	//tlsConfig := &tls.Config{
+	//	PreferServerCipherSuites: true,
+	//	CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP256},
+	//}
 
 	infoLog.Println("Starting server on: ", *addr)
 
@@ -84,13 +83,13 @@ func main() {
 		Addr:         *addr,
 		ErrorLog:     errorLog,
 		Handler:      app.routes(),
-		TLSConfig:    tlsConfig,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 
-	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	//err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
 
